@@ -1,0 +1,19 @@
+{
+  "name": "test-codecommit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git-codecommit.ap-southeast-1.amazonaws.com/v1/repos/test-codecommit"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

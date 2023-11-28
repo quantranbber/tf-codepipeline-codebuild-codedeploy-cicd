@@ -1,0 +1,13 @@
+/node_modules
+/.env
+/.env.*
+!/.env.sample
+/.webpack
+/.serverless
+/build
+/coverage
+/*.log
+.DS_Store
+.idea
+/infrastructure/.terraform
+/infrastructure/.terraform.*

@@ -67,9 +67,78 @@ resource "aws_codedeploy_deployment_group" "example_codedeploy_group" {
   }
 }
 
-resource "aws_codepipeline" "example_pipeline" {
+resource "time_sleep" "wait_120_seconds" {
   depends_on = [aws_instance.cicd_instance]
-  name       = "example-pipeline"
+
+  create_duration = "120s"
+}
+
+resource "aws_codepipeline" "develop_pipeline" {
+  depends_on = [time_sleep.wait_120_seconds]
+  name       = "develop_pipeline"
+  role_arn   = local.codepipeline_role_arn
+
+  artifact_store {
+    location = local.artifact_bucket
+    type     = "S3"
+  }
+
+  stage {
+    name = "Source"
+
+    action {
+      name             = "SourceAction"
+      category         = "Source"
+      owner            = "AWS"
+      provider         = "CodeCommit"
+      version          = "1"
+      output_artifacts = ["SourceOutput"]
+
+      configuration = {
+        RepositoryName = local.repository_name
+        BranchName     = "master"
+      }
+    }
+  }
+
+  stage {
+    name = "Lint"
+
+    action {
+      name            = "LintAction"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+      input_artifacts = ["SourceOutput"]
+
+      configuration = {
+        ProjectName = aws_codebuild_project.lint_project.name
+      }
+    }
+  }
+  #
+  #  stage {
+  #    name = "Build"
+  #
+  #    action {
+  #      name            = "BuildAction"
+  #      category        = "Build"
+  #      owner           = "AWS"
+  #      provider        = "CodeBuild"
+  #      version         = "1"
+  #      input_artifacts = ["SourceOutput"]
+  #
+  #      configuration = {
+  #        ProjectName = aws_codebuild_project.build_project.name
+  #      }
+  #    }
+  #  }
+}
+
+resource "aws_codepipeline" "master_pipeline" {
+  depends_on = [time_sleep.wait_120_seconds]
+  name       = "master_pipeline"
   role_arn   = local.codepipeline_role_arn
 
   artifact_store {
